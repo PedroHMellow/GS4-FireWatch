@@ -63,6 +63,49 @@ A solução é construída com uma arquitetura moderna dividida em frontend e ba
    npm install
    ```
 
+   ## Exemplos Básicos de Uso da API
+
+### Endpoints Disponíveis
+
+### Queimadas
+
+- **Listar Queimadas**
+    - GET `/api/queimadas`
+    - Retorna lista de todos os focos de queimada
+- **Registrar Queimada**
+    - POST `/api/queimadas`
+    - Corpo da requisição:
+        
+        ```json
+        {
+          "latitude": -15.7801,
+          "longitude": -47.9292,
+          "nivelRisco": "ALTO",
+          "descricao": "Foco de queimada detectado"
+        }
+        
+        ```
+        
+
+### Denúncias
+
+- **Listar Denúncias**
+    - GET `/api/denuncias`
+    - Retorna lista de todas as denúncias registradas
+- **Registrar Denúncia**
+    - POST `/api/denuncias`
+    - Corpo da requisição:
+        
+        ```json
+        {
+          "latitude": -15.7801,
+          "longitude": -47.9292,
+          "descricao": "Fumaça visível na região",
+          "foto": "base64_encoded_image"
+        }
+        
+        ```
+
 3. Inicie o servidor de desenvolvimento:
    ```bash
    npm start
