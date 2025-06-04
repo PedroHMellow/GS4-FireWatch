@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireWatch - Sistema Integrado de Monitoramento de Queimadas</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <i class="fas fa-fire-extinguisher logo-icon"></i>
+                <div>
+                    <h1>FireWatch</h1>
+                    <p class="tagline">Sistema Integrado de Monitoramento de Queimadas</p>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <button class="nav-btn active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="nav-btn" data-section="map">
+                    <i class="fas fa-map"></i> Mapa
+                </button>
+                <button class="nav-btn" data-section="alerts">
+                    <i class="fas fa-exclamation-triangle"></i> Alertas
+                </button>
+                <button class="nav-btn" data-section="drones">
+                    <i class="fas fa-helicopter"></i> Drones
+                </button>
+                <button class="nav-btn" data-section="sensors">
+                    <i class="fas fa-broadcast-tower"></i> Sensores
+                </button>
+                <button class="nav-btn" data-section="reports">
+                    <i class="fas fa-chart-bar"></i> Relatórios
+                </button>
+                <button class="nav-btn" data-section="complaints">
+                    <i class="fas fa-user-edit"></i> Denúncias
+                </button>
+            </nav>
+            <div class="header-actions">
+                <button class="emergency-btn">
+                    <i class="fas fa-phone"></i> Emergência
+                </button>
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-container">
+            <div class="status-item">
+                <i class="fas fa-circle status-online"></i>
+                <span>Sistema Online</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-satellite-dish"></i>
+                <span id="sensors-online">--</span> Sensores Ativos
+            </div>
+            <div class="status-item">
+                <i class="fas fa-helicopter"></i>
+                <span id="drones-available">--</span> Drones Disponíveis
+            </div>
+            <div class="status-item">
+                <i class="fas fa-fire"></i>
+                <span id="active-incidents">--</span> Incidentes Ativos
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="dashboard-grid">
+                <!-- Cards de Estatísticas Principais -->
+                <div class="stats-overview">
+                    <div class="stat-card critical">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Focos Ativos</h3>
+                            <p class="stat-number" id="active-fires">0</p>
+                            <span class="stat-change">+2 nas últimas 2h</span>
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Alertas Pendentes</h3>
+                            <p class="stat-number" id="pending-alerts">0</p>
+                            <span class="stat-change">3 novos hoje</span>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Incidentes Resolvidos</h3>
+                            <p class="stat-number" id="resolved-incidents">0</p>
+                            <span class="stat-change">+15 esta semana</span>
+                        </div>
+                    </div>
+                    <div class="stat-card info">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Tempo Médio Resposta</h3>
+                            <p class="stat-number" id="avg-response">0</p>
+                            <span class="stat-change">min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alertas Recentes -->
+                <div class="recent-alerts">
+                    <h2><i class="fas fa-bell"></i> Alertas Recentes</h2>
+                    <div id="recent-alerts-list" class="alerts-list">
+                        <!-- Alertas serão carregados dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Gráfico de Risco -->
+                <div class="risk-analysis">
+                    <h2><i class="fas fa-chart-line"></i> Análise de Risco por Região</h2>
+                    <canvas id="riskChart"></canvas>
+                </div>
+
+                <!-- Atividade dos Drones -->
+                <div class="drone-activity">
+                    <h2><i class="fas fa-helicopter"></i> Atividade dos Drones</h2>
+                    <div id="drone-status-list" class="drone-list">
+                        <!-- Status dos drones serão carregados dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section id="map" class="content-section">
+            <div class="map-container">
+                <div class="map-header">
+                    <h2><i class="fas fa-map"></i> Mapa de Monitoramento em Tempo Real</h2>
+                    <div class="map-controls">
+                        <button class="map-btn" id="toggle-heatmap">
+                            <i class="fas fa-thermometer-half"></i> Mapa de Calor
+                        </button>
+                        <button class="map-btn" id="toggle-sensors">
+                            <i class="fas fa-broadcast-tower"></i> Sensores
+                        </button>
+                        <button class="map-btn" id="toggle-drones">
+                            <i class="fas fa-helicopter"></i> Drones
+                        </button>
+                        <button class="map-btn" id="refresh-map">
+                            <i class="fas fa-sync-alt"></i> Atualizar
+                        </button>
+                    </div>
+                </div>
+                <div id="interactive-map"></div>
+                <div class="map-legend">
+                    <h3>Legenda</h3>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <span class="legend-color fire-active"></span>
+                            <span>Fogo Ativo (Crítico)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color fire-combat"></span>
+                            <span>Em Combate</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color fire-controlled"></span>
+                            <span>Controlado</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color fire-extinguished"></span>
+                            <span>Extinto</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon"><i class="fas fa-broadcast-tower"></i></span>
+                            <span>Sensor Ativo</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon"><i class="fas fa-helicopter"></i></span>
+                            <span>Drone em Operação</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon"><i class="fas fa-user-friends"></i></span>
+                            <span>Equipe de Campo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alerts Section -->
+        <section id="alerts" class="content-section">
+            <div class="alerts-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Central de Alertas</h2>
+                <div class="alerts-actions">
+                    <button class="btn btn-primary" id="create-alert">
+                        <i class="fas fa-plus"></i> Novo Alerta
+                    </button>
+                    <select id="alert-filter" class="filter-select">
+                        <option value="all">Todos os Alertas</option>
+                        <option value="critical">Críticos</option>
+                        <option value="warning">Avisos</option>
+                        <option value="resolved">Resolvidos</option>
+                    </select>
+                </div>
+            </div>
+            <div class="alerts-grid">
+                <div id="alerts-list" class="alerts-container">
+                    <!-- Alertas serão carregados dinamicamente via API -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Drones Section -->
+        <section id="drones" class="content-section">
+            <div class="drones-header">
+                <h2><i class="fas fa-helicopter"></i> Gestão de Drones</h2>
+                <div class="drones-stats">
+                    <span class="drone-stat">
+                        <i class="fas fa-circle text-success"></i>
+                        <span id="drones-operational">0</span> Operacionais
+                    </span>
+                    <span class="drone-stat">
+                        <i class="fas fa-circle text-warning"></i>
+                        <span id="drones-mission">0</span> Em Missão
+                    </span>
+                    <span class="drone-stat">
+                        <i class="fas fa-circle text-danger"></i>
+                        <span id="drones-maintenance">0</span> Manutenção
+                    </span>
+                </div>
+            </div>
+            <div class="drones-grid">
+                <div id="drones-list" class="drones-container">
+                    <!-- Lista de drones será carregada dinamicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Sensors Section -->
+        <section id="sensors" class="content-section">
+            <div class="sensors-header">
+                <h2><i class="fas fa-broadcast-tower"></i> Rede de Sensores</h2>
+                <div class="sensors-overview">
+                    <div class="sensor-summary">
+                        <span class="sensor-count" id="total-sensors">0</span>
+                        <span class="sensor-label">Total de Sensores</span>
+                    </div>
+                    <div class="sensor-summary">
+                        <span class="sensor-count" id="online-sensors">0</span>
+                        <span class="sensor-label">Online</span>
+                    </div>
+                    <div class="sensor-summary">
+                        <span class="sensor-count" id="offline-sensors">0</span>
+                        <span class="sensor-label">Offline</span>
+                    </div>
+                </div>
+            </div>
+            <div class="sensors-content">
+                <div class="sensors-map">
+                    <h3>Distribuição dos Sensores</h3>
+                    <div id="sensors-map-container"></div>
+                </div>
+                <div class="sensors-data">
+                    <h3>Dados dos Sensores</h3>
+                    <div id="sensors-table" class="sensors-table">
+                        <!-- Tabela de sensores será carregada dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section id="reports" class="content-section">
+            <div class="reports-header">
+                <h2><i class="fas fa-chart-bar"></i> Relatórios e Análises</h2>
+                <div class="report-filters">
+                    <select id="report-period" class="filter-select">
+                        <option value="today">Hoje</option>
+                        <option value="week">Última Semana</option>
+                        <option value="month">Último Mês</option>
+                        <option value="year">Último Ano</option>
+                    </select>
+                    <button class="btn btn-primary" id="generate-report">
+                        <i class="fas fa-file-export"></i> Gerar Relatório
+                    </button>
+                </div>
+            </div>
+            <div class="reports-grid">
+                <div class="report-chart">
+                    <h3>Incidentes por Período</h3>
+                    <canvas id="incidentsChart"></canvas>
+                </div>
+                <div class="report-chart">
+                    <h3>Eficiência de Resposta</h3>
+                    <canvas id="responseChart"></canvas>
+                </div>
+                <div class="report-summary">
+                    <h3>Resumo Executivo</h3>
+                    <div id="executive-summary" class="summary-content">
+                        <!-- Resumo será gerado dinamicamente -->
+                    </div>
+                </div>
+                <div class="report-trends">
+                    <h3>Tendências e Previsões</h3>
+                    <canvas id="trendsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Complaints Section -->
+        <section id="complaints" class="content-section">
+            <div class="complaints-header">
+                <h2><i class="fas fa-user-edit"></i> Portal de Denúncias Cidadãs</h2>
+                <p class="complaints-description">
+                    Cidadãos podem reportar focos de queimadas e situações suspeitas diretamente para nosso sistema.
+                </p>
+            </div>
+            <div class="complaints-content">
+                <div class="complaint-form-container">
+                    <h3>Nova Denúncia</h3>
+                    <form id="complaint-form" class="complaint-form">
+                        <div class="form-group">
+                            <label for="complainant-name">Nome do Denunciante</label>
+                            <input type="text" id="complainant-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="complainant-phone">Telefone (opcional)</label>
+                            <input type="tel" id="complainant-phone" name="phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="incident-location">Localização</label>
+                            <input type="text" id="incident-location" name="location" placeholder="Endereço ou coordenadas" required>
+                            <button type="button" class="btn btn-secondary" id="get-location">
+                                <i class="fas fa-crosshairs"></i> Usar Localização Atual
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="incident-description">Descrição do Incidente</label>
+                            <textarea id="incident-description" name="description" rows="4" required 
+                                placeholder="Descreva o que foi observado (fumaça, chamas, área afetada, etc.)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="incident-photos">Fotos (opcional)</label>
+                            <input type="file" id="incident-photos" name="photos" multiple accept="image/*">
+                            <small>Máximo 5 fotos, até 5MB cada</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="incident-severity">Gravidade Estimada</label>
+                            <select id="incident-severity" name="severity" required>
+                                <option value="">Selecione...</option>
+                                <option value="low">Baixa - Fumaça leve</option>
+                                <option value="medium">Média - Fumaça visível</option>
+                                <option value="high">Alta - Chamas visíveis</option>
+                                <option value="critical">Crítica - Fogo descontrolado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-large">
+                            <i class="fas fa-paper-plane"></i> Enviar Denúncia
+                        </button>
+                    </form>
+                </div>
+                <div class="complaints-list-container">
+                    <h3>Denúncias Recentes</h3>
+                    <div id="complaints-list" class="complaints-list">
+                        <!-- Lista de denúncias será carregada dinamicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para Alertas de Emergência -->
+    <div id="emergency-modal" class="modal">
+        <div class="modal-content emergency">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Alerta de Emergência</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="emergency-info">
+                    <p id="emergency-message">Novo incidente detectado!</p>
+                    <div class="emergency-details">
+                        <span><strong>Localização:</strong> <span id="emergency-location">--</span></span>
+                        <span><strong>Severidade:</strong> <span id="emergency-severity">--</span></span>
+                        <span><strong>Tempo:</strong> <span id="emergency-time">--</span></span>
+                    </div>
+                </div>
+                <div class="emergency-actions">
+                    <button class="btn btn-danger" id="dispatch-emergency">
+                        <i class="fas fa-helicopter"></i> Despachar Drone
+                    </button>
+                    <button class="btn btn-warning" id="alert-authorities">
+                        <i class="fas fa-phone"></i> Alertar Autoridades
+                    </button>
+                    <button class="btn btn-secondary" id="acknowledge-alert">
+                        <i class="fas fa-check"></i> Reconhecer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>FireWatch</h4>
+                <p>Sistema integrado de monitoramento e combate a queimadas</p>
+            </div>
+            <div class="footer-section">
+                <h4>Contatos de Emergência</h4>
+                <p><i class="fas fa-phone"></i> Bombeiros: 193</p>
+                <p><i class="fas fa-phone"></i> Defesa Civil: 199</p>
+            </div>
+            <div class="footer-section">
+                <h4>Status do Sistema</h4>
+                <p><i class="fas fa-circle text-success"></i> Todos os sistemas operacionais</p>
+                <p><small>Última atualização: <span id="last-update">--</span></small></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Leaflet Heatmap -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Scripts -->
+    <script src="/js/navigation.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/map.js"></script>
+    <script src="/js/alerts.js"></script>
+    <script src="/js/drones.js"></script>
+    <script src="/js/sensors.js"></script>
+    <script src="/js/reports.js"></script>
+    <script src="/js/complaints.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

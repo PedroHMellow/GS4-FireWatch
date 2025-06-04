@@ -1,0 +1,1222 @@
+/* FireWatch - Sistema de Monitoramento de Queimadas */
+/* Reset e Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 14px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Header Principal */
+.main-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-icon {
+    font-size: 2.5rem;
+    color: #e74c3c;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.logo-section h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.tagline {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+/* Navegação Principal */
+.main-nav {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 2px solid transparent;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.nav-btn:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border-color: rgba(231, 76, 60, 0.3);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+/* Ações do Header */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.emergency-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); }
+    to { box-shadow: 0 0 20px rgba(231, 76, 60, 0.8); }
+}
+
+.emergency-btn:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #555;
+    font-weight: 500;
+}
+
+.user-profile i {
+    font-size: 1.5rem;
+    color: #3498db;
+}
+
+/* Status Bar */
+.status-bar {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 0;
+}
+
+.status-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.status-online {
+    color: #2ecc71;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+/* Conteúdo Principal */
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: calc(100vh - 200px);
+}
+
+/* Seções de Conteúdo */
+.content-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.content-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dashboard */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 2rem;
+    grid-template-areas: 
+        "stats stats"
+        "alerts risk"
+        "drones drones";
+}
+
+.stats-overview {
+    grid-area: stats;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--card-color);
+}
+
+.stat-card.critical { --card-color: #e74c3c; }
+.stat-card.warning { --card-color: #f39c12; }
+.stat-card.success { --card-color: #2ecc71; }
+.stat-card.info { --card-color: #3498db; }
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 3rem;
+    color: var(--card-color);
+    opacity: 0.8;
+}
+
+.stat-content h3 {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.stat-change {
+    font-size: 0.8rem;
+    color: #95a5a6;
+}
+
+/* Alertas Recentes */
+.recent-alerts {
+    grid-area: alerts;
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.recent-alerts h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alerts-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+}
+
+.alert-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-item.critical {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: #e74c3c;
+}
+
+.alert-item.warning {
+    background: rgba(243, 156, 18, 0.1);
+    border-color: #f39c12;
+}
+
+.alert-item.info {
+    background: rgba(52, 152, 219, 0.1);
+    border-color: #3498db;
+}
+
+.alert-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.alert-description {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 0.25rem;
+}
+
+.alert-time {
+    font-size: 0.8rem;
+    color: #95a5a6;
+}
+
+/* Análise de Risco */
+.risk-analysis {
+    grid-area: risk;
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.risk-analysis h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.risk-analysis canvas {
+    max-height: 300px; /* Adjust as needed */
+    width: 100%; /* Ensure it takes the full width of its container */
+}
+
+/* Atividade dos Drones */
+.drone-activity {
+    grid-area: drones;
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.drone-activity h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.drone-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.drone-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.drone-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.drone-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.drone-status.operational { background: #2ecc71; }
+.drone-status.mission { background: #f39c12; }
+.drone-status.maintenance { background: #e74c3c; }
+
+.drone-info h4 {
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.drone-location {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+/* Seção do Mapa */
+.map-container {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.map-header {
+    background: #2c3e50;
+    color: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.map-header h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.map-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.map-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.map-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.map-btn.active {
+    background: white;
+    color: #2c3e50;
+}
+
+#interactive-map {
+    height: 500px;
+    position: relative;
+}
+
+.map-legend {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 250px;
+}
+
+.map-legend h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.legend-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-color.fire-active { background: #e74c3c; }
+.legend-color.fire-combat { background: #f39c12; }
+.legend-color.fire-controlled { background: #f1c40f; }
+.legend-color.fire-extinguished { background: #2ecc71; }
+
+.legend-icon {
+    width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Seção de Alertas */
+.alerts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alerts-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alerts-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.alerts-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.alerts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Seção de Drones */
+.drones-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.drones-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.drones-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.drone-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.drones-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.drones-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Seção de Sensores */
+.sensors-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sensors-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sensors-overview {
+    display: flex;
+    gap: 2rem;
+}
+
+.sensor-summary {
+    text-align: center;
+}
+
+.sensor-count {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.sensor-label {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.sensors-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.sensors-map, .sensors-data {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sensors-map h3, .sensors-data h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+#sensors-map-container {
+    height: 300px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.sensors-table {
+    overflow-x: auto;
+}
+
+/* Seção de Relatórios */
+.reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.reports-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.report-filters {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.reports-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 2rem;
+    grid-template-areas:
+        "incidents response"
+        "summary trends";
+}
+
+.report-chart {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.report-chart h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.report-chart:nth-child(1) { grid-area: incidents; }
+.report-chart:nth-child(2) { grid-area: response; }
+
+.report-summary {
+    grid-area: summary;
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.report-summary h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.summary-content {
+    line-height: 1.8;
+    color: #555;
+}
+
+.report-trends {
+    grid-area: trends;
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.report-trends h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+/* Seção de Denúncias */
+.complaints-header {
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.complaints-header h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.complaints-description {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.complaints-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.complaint-form-container, .complaints-list-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.complaint-form-container h3, .complaints-list-container h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.complaint-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group small {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+}
+
+.complaints-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Botões */
+.btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+    background: #3498db;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+}
+
+.btn-danger {
+    background: #e74c3c;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-warning {
+    background: #f39c12;
+}
+
+.btn-warning:hover {
+    background: #e67e22;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+}
+
+/* Filtros e Selects */
+.filter-select {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 20px;
+    background: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content.emergency {
+    border-top: 5px solid #e74c3c;
+}
+
+.modal-header {
+    background: #f8f9fa;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #7f8c8d;
+    transition: color 0.3s ease;
+}
+
+.modal-close:hover {
+    color: #e74c3c;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.emergency-info {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.emergency-info p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #e74c3c;
+    margin-bottom: 1rem;
+}
+
+.emergency-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.emergency-details span {
+    color: #555;
+}
+
+.emergency-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Footer */
+.main-footer {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    margin-top: 4rem;
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 3rem 2rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.footer-section h4 {
+    color: #3498db;
+    margin-bottom: 1rem;
+}
+
+.footer-section p {
+    margin-bottom: 0.5rem;
+    color: #bdc3c7;
+}
+
+.footer-section i {
+    color: #3498db;
+    margin-right: 0.5rem;
+}
+
+/* Cores de Status */
+.text-success { color: #2ecc71; }
+.text-warning { color: #f39c12; }
+.text-danger { color: #e74c3c; }
+.text-info { color: #3498db; }
+
+/* Scrollbar Personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bdc3c7;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+    .header-container {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .main-nav {
+        flex-wrap: wrap;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "stats"
+            "alerts"
+            "risk"
+            "drones";
+    }
+    
+    .complaints-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .reports-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "incidents"
+            "response"
+            "summary"
+            "trends";
+    }
+    
+    .sensors-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 12px;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    .status-container {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .main-nav {
+        justify-content: center;
+    }
+    
+    .alerts-container,
+    .drones-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .map-legend {
+        position: static;
+        margin-top: 1rem;
+    }
+    
+    .emergency-actions {
+        flex-direction: column;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-btn {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .nav-btn span {
+        display: none;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .alerts-header,
+    .drones-header,
+    .sensors-header,
+    .reports-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+}
